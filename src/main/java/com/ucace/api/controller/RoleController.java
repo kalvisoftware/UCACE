@@ -3,9 +3,13 @@ package com.ucace.api.controller;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
+import com.ucace.api.dto.RoleRequestDTO;
+import com.ucace.api.dto.RoleResponseDTO;
 import com.ucace.api.entity.Role;
 import com.ucace.api.service.RoleService;
 import java.util.*;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/roles")
@@ -18,26 +22,26 @@ public class RoleController {
     }
 
     @PostMapping
-    public ResponseEntity<Role> saveRole(@RequestBody Role role) {
-        Role savedRole = roleService.saveRole(role);
+    public ResponseEntity<RoleResponseDTO> saveRole(@Valid @RequestBody RoleRequestDTO role) {
+        RoleResponseDTO savedRole = roleService.saveRole(role);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedRole);
     }
 
     @GetMapping
-    public ResponseEntity<List<Role>> getAllRoles() {
-        List<Role> getAllRoles = roleService.getAllRoles();
+    public ResponseEntity<List<RoleResponseDTO>> getAllRoles() {
+        List<RoleResponseDTO> getAllRoles = roleService.getAllRoles();
         return ResponseEntity.ok(getAllRoles);
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<Role> getRoleById(@PathVariable Long id) {
-        Role getRoleById = roleService.getRoleById(id);
+    public ResponseEntity<RoleResponseDTO> getRoleById(@PathVariable Long id) {
+        RoleResponseDTO getRoleById = roleService.getRoleById(id);
         return ResponseEntity.ok(getRoleById);
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<Role> updateRole(@RequestBody Role role, @PathVariable Long id) {
-        Role updateRole = roleService.updateRole(id, role);
+    public ResponseEntity<RoleResponseDTO> updateRole(@Valid @RequestBody RoleRequestDTO role, @PathVariable Long id) {
+        RoleResponseDTO updateRole = roleService.updateRole(id, role);
         return ResponseEntity.ok(updateRole);
     }
 

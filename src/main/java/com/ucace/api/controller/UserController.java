@@ -1,19 +1,15 @@
 package com.ucace.api.controller;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.ucace.api.service.UserService;
-import com.ucace.api.entity.User;
+import com.ucace.api.dto.UserRequestDTO;
+import com.ucace.api.dto.UserResponseDTO;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/users")
@@ -25,26 +21,26 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<User> saveUser(@RequestBody User user) {
-        User savedUser = userService.saveUser(user);
+    public ResponseEntity<UserResponseDTO> saveUser(@Valid @RequestBody UserRequestDTO user) {
+        UserResponseDTO savedUser = userService.saveUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> getAllUser() {
-        List<User> getAllUser = userService.getAllUser();
-        return ResponseEntity.ok(getAllUser);
+    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
+        List<UserResponseDTO> getAllUsers = userService.getAllUsers();
+        return ResponseEntity.ok(getAllUsers);
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
-        User getUserById = userService.getUserById(id);
+    public ResponseEntity<UserResponseDTO> getUserById(@PathVariable Long id) {
+        UserResponseDTO getUserById = userService.getUserById(id);
         return ResponseEntity.ok(getUserById);
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
-        User updateUser = userService.updateUser(id, user);
+    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long id, @Valid @RequestBody UserRequestDTO user) {
+        UserResponseDTO updateUser = userService.updateUser(id, user);
         return ResponseEntity.ok(updateUser);
     }
 

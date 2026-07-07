@@ -1,17 +1,19 @@
 package com.ucace.api.service;
 
 import java.util.List;
-import com.ucace.api.entity.User;
+
+import com.ucace.api.dto.UserRequestDTO;
+import com.ucace.api.dto.UserResponseDTO;
 
 public interface UserService {
 
-    User saveUser(User user);
+    UserResponseDTO saveUser(UserRequestDTO user);
 
-    List<User> getAllUser();
+    List<UserResponseDTO> getAllUsers();
 
-    User getUserById(Long id);
+    UserResponseDTO getUserById(Long id);
 
-    User updateUser(Long id, User user);
+    UserResponseDTO updateUser(Long id, UserRequestDTO user);
 
     String deleteUser(Long id);
 
