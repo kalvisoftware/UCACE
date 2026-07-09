@@ -10,6 +10,7 @@ import com.ucace.api.dto.UserRequestDTO;
 import com.ucace.api.dto.UserResponseDTO;
 import com.ucace.api.entity.Role;
 import com.ucace.api.entity.User;
+import com.ucace.api.exception.ResourceNotFoundException;
 import com.ucace.api.repository.RoleRepository;
 import com.ucace.api.repository.UserRepository;
 import com.ucace.api.service.UserService;
@@ -39,12 +40,13 @@ public class UserServiceImpl implements UserService {
     }
 
     public UserResponseDTO getUserById(Long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User Not Found"));
+        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
         return convertToDTO(user);
     }
 
     public UserResponseDTO updateUser(Long id, UserRequestDTO user) {
-        User existingUser = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User Not Found"));
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
         if (existingUser != null) {
             User userEntity = updateEntity(existingUser, user);
             return convertToDTO(userRepository.save(userEntity));
@@ -78,7 +80,7 @@ public class UserServiceImpl implements UserService {
         userEntity.setMobileNo(user.getMobileNo());
         userEntity.setStatus(user.getStatus());
         Role role = roleRepository.findById(user.getRoleId())
-                .orElseThrow(() -> new RuntimeException("Role not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found"));
         userEntity.setRole(role);
         userEntity.setCreatedDate(LocalDateTime.now());
         userEntity.setUpdatedDate(LocalDateTime.now());
@@ -93,7 +95,7 @@ public class UserServiceImpl implements UserService {
         existingUser.setMobileNo(dto.getMobileNo());
         existingUser.setStatus(dto.getStatus());
         existingUser.setRole(roleRepository.findById(dto.getRoleId())
-                .orElseThrow(() -> new RuntimeException("Role not found")));
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found")));
         existingUser.setUpdatedDate(LocalDateTime.now());
         return existingUser;
 

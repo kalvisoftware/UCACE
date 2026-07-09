@@ -3,13 +3,12 @@ package com.ucace.api.service.impl;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ucace.api.dto.RoleRequestDTO;
 import com.ucace.api.dto.RoleResponseDTO;
 import com.ucace.api.entity.Role;
+import com.ucace.api.exception.ResourceNotFoundException;
 import com.ucace.api.repository.RoleRepository;
 import com.ucace.api.service.RoleService;
 
@@ -39,7 +38,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public RoleResponseDTO getRoleById(Long id) {
-        Role role = roleRepository.findById(id).orElseThrow(() -> new RuntimeException("Role Not Found"));
+        Role role = roleRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Role Not Found"));
         return convertToDTO(role);
     }
 
@@ -47,7 +46,7 @@ public class RoleServiceImpl implements RoleService {
     public RoleResponseDTO updateRole(Long id, RoleRequestDTO role) {
 
         Role existingRole = roleRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Role Not Found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Role Not Found"));
 
         existingRole.setRoleName(role.getRoleName());
         existingRole.setDescription(role.getDescription());
