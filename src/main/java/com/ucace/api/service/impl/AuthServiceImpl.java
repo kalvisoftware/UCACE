@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.ucace.api.dto.LoginRequestDTO;
+import com.ucace.api.dto.LoginResponseDTO;
 import com.ucace.api.dto.RegisterRequestDTO;
 import com.ucace.api.dto.UserResponseDTO;
 import com.ucace.api.entity.Role;
@@ -73,5 +75,21 @@ public class AuthServiceImpl implements AuthService {
         user.setCreatedDate(LocalDateTime.now());
         user.setUpdatedDate(LocalDateTime.now());
         return user;
+    }
+
+    public LoginResponseDTO loginUser(LoginRequestDTO loginRequestDTO) {
+
+        User user = userRepository.findByUserName(loginRequestDTO.getUserName())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        boolean isPasswordMatched = passwordEncoder.matches(
+                loginRequestDTO.getPassword(),
+                user.getPassword());
+
+        if (!isPasswordMatched) {
+            throw new RuntimeException("Invalid Username or Password");
+        }
+
+        return new LoginResponseDTO();
     }
 }
