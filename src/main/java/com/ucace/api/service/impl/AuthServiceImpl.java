@@ -15,6 +15,7 @@ import com.ucace.api.exception.ResourceAlreadyExistsException;
 import com.ucace.api.exception.ResourceNotFoundException;
 import com.ucace.api.repository.RoleRepository;
 import com.ucace.api.repository.UserRepository;
+import com.ucace.api.security.JwtUtil;
 import com.ucace.api.service.AuthService;
 
 @Service
@@ -23,12 +24,14 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     public AuthServiceImpl(UserRepository userRepository,
-            RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+            RoleRepository roleRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
     }
 
     @Override
@@ -90,6 +93,9 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("Invalid Username or Password");
         }
 
-        return new LoginResponseDTO();
+        String token = jwtUtil.generateToken(user.getUserName());
+        LoginResponseDTO loginResponseDTO = new LoginResponseDTO();
+        loginResponseDTO.setToken(token);
+        return loginResponseDTO;
     }
 }

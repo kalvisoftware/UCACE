@@ -1,6 +1,7 @@
 package com.ucace.api.controller;
 
 import org.springframework.http.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.ucace.api.dto.RoleRequestDTO;
@@ -28,6 +29,7 @@ public class RoleController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Save Role", description = "Create a new role")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Role created successfully"),
@@ -39,6 +41,7 @@ public class RoleController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @Operation(summary = "Get All Roles", description = "Retrieve a list of all roles")
     public ResponseEntity<List<RoleResponseDTO>> getAllRoles() {
         List<RoleResponseDTO> getAllRoles = roleService.getAllRoles();
@@ -46,6 +49,8 @@ public class RoleController {
     }
 
     @GetMapping("{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+
     @Operation(summary = "Get Role by ID", description = "Retrieve a role by its ID")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Role found"),
@@ -57,6 +62,7 @@ public class RoleController {
     }
 
     @PutMapping("{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update Role", description = "Update an existing role by its ID")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Role updated successfully"),
@@ -69,6 +75,7 @@ public class RoleController {
     }
 
     @DeleteMapping("{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Delete Role", description = "Delete a role by its ID")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Role deleted successfully"),
