@@ -44,4 +44,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
+    @ExceptionHandler(InvalidPasswordException.class)
+    public ResponseEntity<ErrorResponse> invalidPasswordException(InvalidPasswordException ex) {
+        ErrorResponse error = new ErrorResponse(HttpStatus.NO_CONTENT.value(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(error);
+    }
+
 }

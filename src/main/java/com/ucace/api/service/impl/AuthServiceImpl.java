@@ -2,15 +2,19 @@ package com.ucace.api.service.impl;
 
 import java.time.LocalDateTime;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.ucace.api.dto.ChangePasswordRequestDTO;
 import com.ucace.api.dto.LoginRequestDTO;
 import com.ucace.api.dto.LoginResponseDTO;
 import com.ucace.api.dto.RegisterRequestDTO;
 import com.ucace.api.dto.UserResponseDTO;
 import com.ucace.api.entity.Role;
 import com.ucace.api.entity.User;
+import com.ucace.api.exception.InvalidPasswordException;
 import com.ucace.api.exception.ResourceAlreadyExistsException;
 import com.ucace.api.exception.ResourceNotFoundException;
 import com.ucace.api.repository.RoleRepository;
@@ -98,4 +102,43 @@ public class AuthServiceImpl implements AuthService {
         loginResponseDTO.setToken(token);
         return loginResponseDTO;
     }
+
+    @Override
+    public UserResponseDTO getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserName = authentication.getName();
+        User user = userRepository.findByUserName(currentUserName)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        return convertToDTO(user);
+    }
+
+    @Override
+    public String changePassword(ChangePasswordRequestDTO changePasswordRequestDTO) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userName = authentication.getName();
+
+        User user = userRepository.findByUserName(userName)
+                .orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
+
+        boolean isPasswordMatch = passwordEncoder.matches(changePasswordRequestDTO.getOldPassword(),
+                user.getPassword());
+
+        if (!isPasswordMatch) {
+            throw new InvalidPasswordException("Old Password is Incorrect");
+        }
+
+        if (passwordEncoder.matches(
+                changePasswordRequestDTO.getNewPassword(),
+                user.getPassword())) {
+
+            throw new RuntimeException(
+                    "New password should be different from old password");
+        }
+        user.setPassword(passwordEncoder.encode(changePasswordRequestDTO.getNewPassword()));
+        user.setUpdatedDate(LocalDateTime.now());
+        userRepository.save(user);
+        return "Password changed successfully";
+    }
+
 }

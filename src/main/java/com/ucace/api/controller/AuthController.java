@@ -3,8 +3,10 @@ package com.ucace.api.controller;
 import javax.validation.Valid;
 
 import org.springframework.http.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import com.ucace.api.dto.ChangePasswordRequestDTO;
 import com.ucace.api.dto.LoginRequestDTO;
 import com.ucace.api.dto.LoginResponseDTO;
 import com.ucace.api.dto.RegisterRequestDTO;
@@ -32,5 +34,19 @@ public class AuthController {
         // Implement the login logic here
         LoginResponseDTO loginResponse = authService.loginUser(loginRequestDTO);
         return ResponseEntity.ok(loginResponse);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserResponseDTO> getCurrentUser() {
+        UserResponseDTO currentUser = authService.getCurrentUser();
+        return ResponseEntity.ok(currentUser);
+    }
+
+    @PostMapping("/change-password")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
+    public ResponseEntity<String> changePassword(
+            @Valid @RequestBody ChangePasswordRequestDTO changePasswordRequestDTO) {
+        String response = authService.changePassword(changePasswordRequestDTO);
+        return ResponseEntity.ok(response);
     }
 }
