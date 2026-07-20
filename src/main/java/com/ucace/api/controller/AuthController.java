@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import com.ucace.api.dto.ChangePasswordRequestDTO;
 import com.ucace.api.dto.LoginRequestDTO;
 import com.ucace.api.dto.LoginResponseDTO;
+import com.ucace.api.dto.RefreshTokenRequestDTO;
+import com.ucace.api.dto.RefreshTokenResponseDTO;
 import com.ucace.api.dto.RegisterRequestDTO;
 import com.ucace.api.dto.UserResponseDTO;
 import com.ucace.api.service.AuthService;
@@ -47,6 +49,15 @@ public class AuthController {
     public ResponseEntity<String> changePassword(
             @Valid @RequestBody ChangePasswordRequestDTO changePasswordRequestDTO) {
         String response = authService.changePassword(changePasswordRequestDTO);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<RefreshTokenResponseDTO> refreshToken(
+            @Valid @RequestBody RefreshTokenRequestDTO request) {
+
+        RefreshTokenResponseDTO response = authService.refreshToken(request);
+
         return ResponseEntity.ok(response);
     }
 }

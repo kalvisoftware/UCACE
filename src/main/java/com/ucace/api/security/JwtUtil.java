@@ -16,11 +16,21 @@ public class JwtUtil {
     private static final String SECRET_KEY = "UcaceModernSpringBootJwtSecretKey2026";
     private static final long EXPIRATION_TIME = 1000 * 60 * 60; // 1 hour in milliseconds
 
-    public String generateToken(String username) {
+    public String generateAccessToken(String username) {
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .setExpiration(new Date(System.currentTimeMillis() + 120000))
+                .signWith(getSignKey(), SignatureAlgorithm.HS256)
+                .compact();
+
+    }
+
+    public String generateRefreshToken(String username) {
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 604800000))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
 

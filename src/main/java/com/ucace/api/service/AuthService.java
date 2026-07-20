@@ -3,6 +3,8 @@ package com.ucace.api.service;
 import com.ucace.api.dto.ChangePasswordRequestDTO;
 import com.ucace.api.dto.LoginRequestDTO;
 import com.ucace.api.dto.LoginResponseDTO;
+import com.ucace.api.dto.RefreshTokenRequestDTO;
+import com.ucace.api.dto.RefreshTokenResponseDTO;
 import com.ucace.api.dto.RegisterRequestDTO;
 import com.ucace.api.dto.UserResponseDTO;
 
@@ -14,5 +16,7 @@ public interface AuthService {
     public UserResponseDTO getCurrentUser();
 
     public String changePassword(ChangePasswordRequestDTO changePasswordRequestDTO);
+
+    public RefreshTokenResponseDTO refreshToken(RefreshTokenRequestDTO request);
 
 }

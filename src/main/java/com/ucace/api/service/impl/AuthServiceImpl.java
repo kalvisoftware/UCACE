@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import com.ucace.api.dto.ChangePasswordRequestDTO;
 import com.ucace.api.dto.LoginRequestDTO;
 import com.ucace.api.dto.LoginResponseDTO;
+import com.ucace.api.dto.RefreshTokenRequestDTO;
+import com.ucace.api.dto.RefreshTokenResponseDTO;
 import com.ucace.api.dto.RegisterRequestDTO;
 import com.ucace.api.dto.UserResponseDTO;
 import com.ucace.api.entity.Role;
@@ -97,9 +99,11 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("Invalid Username or Password");
         }
 
-        String token = jwtUtil.generateToken(user.getUserName());
+        String accessToken = jwtUtil.generateAccessToken(user.getUserName());
+        String refreshToken = jwtUtil.generateRefreshToken(user.getUserName());
         LoginResponseDTO loginResponseDTO = new LoginResponseDTO();
-        loginResponseDTO.setToken(token);
+        loginResponseDTO.setAccessToken(accessToken);
+        loginResponseDTO.setRefreshToken(refreshToken);
         return loginResponseDTO;
     }
 
@@ -139,6 +143,12 @@ public class AuthServiceImpl implements AuthService {
         user.setUpdatedDate(LocalDateTime.now());
         userRepository.save(user);
         return "Password changed successfully";
+    }
+
+    @Override
+    public RefreshTokenResponseDTO refreshToken(RefreshTokenRequestDTO request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'refreshToken'");
     }
 
 }
