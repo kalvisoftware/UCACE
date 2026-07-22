@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,7 @@ import com.ucace.api.exception.ResourceAlreadyExistsException;
 import com.ucace.api.exception.ResourceNotFoundException;
 import com.ucace.api.repository.RoleRepository;
 import com.ucace.api.repository.UserRepository;
+import com.ucace.api.security.CustomUserDetailsService;
 import com.ucace.api.security.JwtUtil;
 import com.ucace.api.service.AuthService;
 
@@ -31,13 +33,16 @@ public class AuthServiceImpl implements AuthService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final CustomUserDetailsService customUserDetailsService;
 
     public AuthServiceImpl(UserRepository userRepository,
-            RoleRepository roleRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
+            RoleRepository roleRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil,
+            CustomUserDetailsService customUserDetailsService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
+        this.customUserDetailsService = customUserDetailsService;
     }
 
     @Override
@@ -146,9 +151,30 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public RefreshTokenResponseDTO refreshToken(RefreshTokenRequestDTO request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'refreshToken'");
+    public RefreshTokenResponseDTO refreshToken(
+            RefreshTokenRequestDTO request) {
+
+        String refreshToken = request.getRefreshToken();
+
+        String username = jwtUtil.extractUserName(refreshToken);
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
+
+        if (!jwtUtil.validateToken(refreshToken, userDetails)) {
+            throw new RuntimeException("Invalid Refresh Token");
+        }
+
+        String newAccessToken = jwtUtil.generateAccessToken(username);
+
+        RefreshTokenResponseDTO response = new RefreshTokenResponseDTO();
+        response.setAccessToken(newAccessToken);
+
+        return response;
+    }
+
+    @Override
+    public String logout() {
+        SecurityContextHolder.clearContext();
+        return "Logout Successfully";
     }
 
 }

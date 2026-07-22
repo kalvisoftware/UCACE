@@ -60,4 +60,10 @@ public class AuthController {
 
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("logout")
+    public String logout() {
+        String response = authService.logout();
+        return response;
+    }
 }

@@ -19,4 +19,6 @@ public interface AuthService {
 
     public RefreshTokenResponseDTO refreshToken(RefreshTokenRequestDTO request);
 
+    public String logout();
+
 }
