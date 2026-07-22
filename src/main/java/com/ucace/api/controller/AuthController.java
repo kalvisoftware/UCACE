@@ -1,5 +1,7 @@
 package com.ucace.api.controller;
 
+import java.time.LocalDateTime;
+
 import javax.validation.Valid;
 
 import org.springframework.http.*;
@@ -13,6 +15,7 @@ import com.ucace.api.dto.RefreshTokenRequestDTO;
 import com.ucace.api.dto.RefreshTokenResponseDTO;
 import com.ucace.api.dto.RegisterRequestDTO;
 import com.ucace.api.dto.UserResponseDTO;
+import com.ucace.api.response.ApiResponseDTO;
 import com.ucace.api.service.AuthService;
 
 @RestController
@@ -26,44 +29,76 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponseDTO> registerUser(@Valid @RequestBody RegisterRequestDTO registerRequestDTO) {
+    public ResponseEntity<ApiResponseDTO<UserResponseDTO>> registerUser(
+            @Valid @RequestBody RegisterRequestDTO registerRequestDTO) {
         UserResponseDTO registeredUser = authService.registerUser(registerRequestDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(registeredUser);
+        ApiResponseDTO<UserResponseDTO> response = new ApiResponseDTO<>(
+                true,
+                "Registered Successfully",
+                registeredUser,
+                LocalDateTime.now());
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> loginUser(@Valid @RequestBody LoginRequestDTO loginRequestDTO) {
+    public ResponseEntity<ApiResponseDTO<LoginResponseDTO>> loginUser(
+            @Valid @RequestBody LoginRequestDTO loginRequestDTO) {
         // Implement the login logic here
         LoginResponseDTO loginResponse = authService.loginUser(loginRequestDTO);
-        return ResponseEntity.ok(loginResponse);
+        ApiResponseDTO<LoginResponseDTO> response = new ApiResponseDTO<>(
+                true,
+                "Login Successfully",
+                loginResponse,
+                LocalDateTime.now());
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserResponseDTO> getCurrentUser() {
+    public ResponseEntity<ApiResponseDTO<UserResponseDTO>> getCurrentUser() {
         UserResponseDTO currentUser = authService.getCurrentUser();
-        return ResponseEntity.ok(currentUser);
+        ApiResponseDTO<UserResponseDTO> response = new ApiResponseDTO<>(
+                true,
+                "Logged User details",
+                currentUser,
+                LocalDateTime.now());
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/change-password")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
-    public ResponseEntity<String> changePassword(
+    public ResponseEntity<ApiResponseDTO<String>> changePassword(
             @Valid @RequestBody ChangePasswordRequestDTO changePasswordRequestDTO) {
-        String response = authService.changePassword(changePasswordRequestDTO);
+        String responseData = authService.changePassword(changePasswordRequestDTO);
+        ApiResponseDTO<String> response = new ApiResponseDTO<>(
+                true,
+                "Password Changed Successfully",
+                responseData,
+                LocalDateTime.now());
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<RefreshTokenResponseDTO> refreshToken(
+    public ResponseEntity<ApiResponseDTO<RefreshTokenResponseDTO>> refreshToken(
             @Valid @RequestBody RefreshTokenRequestDTO request) {
 
-        RefreshTokenResponseDTO response = authService.refreshToken(request);
+        RefreshTokenResponseDTO responseData = authService.refreshToken(request);
+        ApiResponseDTO<RefreshTokenResponseDTO> response = new ApiResponseDTO<>(
+                true,
+                "Refresh token generated Successfully",
+                responseData,
+                LocalDateTime.now());
 
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("logout")
-    public String logout() {
-        String response = authService.logout();
-        return response;
+    public ResponseEntity<ApiResponseDTO<String>> logout() {
+        String responseData = authService.logout();
+        ApiResponseDTO<String> response = new ApiResponseDTO<>(
+                true,
+                "Logout Successfully",
+                responseData,
+                LocalDateTime.now());
+        return ResponseEntity.ok(response);
     }
 }

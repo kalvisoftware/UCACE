@@ -10,7 +10,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import com.ucace.api.dto.UserRequestDTO;
 import com.ucace.api.dto.UserResponseDTO;
+import com.ucace.api.response.ApiResponseDTO;
+
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -27,37 +31,63 @@ public class UserController {
 
     @PostMapping
     @Operation(summary = "Save User", description = "Create a new user")
-    public ResponseEntity<UserResponseDTO> saveUser(@Valid @RequestBody UserRequestDTO user) {
+    public ResponseEntity<ApiResponseDTO<UserResponseDTO>> saveUser(@Valid @RequestBody UserRequestDTO user) {
         UserResponseDTO savedUser = userService.saveUser(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
+        ApiResponseDTO<UserResponseDTO> response = new ApiResponseDTO<>(
+                true,
+                "User created Successfully",
+                savedUser,
+                LocalDateTime.now());
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping
     @Operation(summary = "Get All Users", description = "Retrieve a list of all users")
-    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
+    public ResponseEntity<ApiResponseDTO<List<UserResponseDTO>>> getAllUsers() {
         List<UserResponseDTO> getAllUsers = userService.getAllUsers();
-        return ResponseEntity.ok(getAllUsers);
+        ApiResponseDTO<List<UserResponseDTO>> response = new ApiResponseDTO<>(
+                true,
+                "Get all Users",
+                getAllUsers,
+                LocalDateTime.now());
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("{id}")
     @Operation
-    public ResponseEntity<UserResponseDTO> getUserById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponseDTO<UserResponseDTO>> getUserById(@PathVariable Long id) {
         UserResponseDTO getUserById = userService.getUserById(id);
-        return ResponseEntity.ok(getUserById);
+        ApiResponseDTO<UserResponseDTO> response = new ApiResponseDTO<>(
+                true,
+                "Get userby id successfully",
+                getUserById,
+                LocalDateTime.now());
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("{id}")
     @Operation(summary = "Update User", description = "Update an existing user by its ID")
-    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long id, @Valid @RequestBody UserRequestDTO user) {
+    public ResponseEntity<ApiResponseDTO<UserResponseDTO>> updateUser(@PathVariable Long id,
+            @Valid @RequestBody UserRequestDTO user) {
         UserResponseDTO updateUser = userService.updateUser(id, user);
-        return ResponseEntity.ok(updateUser);
+        ApiResponseDTO<UserResponseDTO> response = new ApiResponseDTO<>(
+                true,
+                "User Updated Successfully",
+                updateUser,
+                LocalDateTime.now());
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("{id}")
     @Operation(summary = "Delete User", description = "Delete a user by its ID")
-    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<ApiResponseDTO<String>> deleteUser(@PathVariable Long id) {
         String deleteRole = userService.deleteUser(id);
-        return ResponseEntity.ok(deleteRole);
+        ApiResponseDTO<String> response = new ApiResponseDTO<>(
+                true,
+                "User Deleted Successfully",
+                deleteRole,
+                LocalDateTime.now());
+        return ResponseEntity.ok(response);
     }
 
 }
