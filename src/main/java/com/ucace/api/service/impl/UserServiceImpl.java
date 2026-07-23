@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.ucace.api.dto.UserRequestDTO;
@@ -32,11 +34,21 @@ public class UserServiceImpl implements UserService {
         return convertToDTO(savedUser);
     }
 
-    public List<UserResponseDTO> getAllUsers() {
-        List<User> getAllUser = userRepository.findAll();
-        return getAllUser.stream().map(user -> {
-            return convertToDTO(user);
-        }).collect(Collectors.toList());
+    public Page<UserResponseDTO> getAllUsers(Pageable pageable) {
+        Page<User> getAllUser = userRepository.findAll(pageable);
+        // return getAllUser.stream().map(user -> {
+        // return convertToDTO(user);
+        // }).collect(Collectors.toList());
+        return getAllUser.map(this::convertToDTO);
+    }
+
+    public Page<UserResponseDTO> searchUsers(String keyword, Pageable pageable) {
+        Page<User> users = userRepository.findByUserNameContainingIgnoreCaseOrEmailContainingIgnoreCase(
+                keyword,
+                keyword,
+                pageable);
+
+        return users.map(this::convertToDTO);
     }
 
     public UserResponseDTO getUserById(Long id) {

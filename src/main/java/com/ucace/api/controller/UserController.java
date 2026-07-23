@@ -1,5 +1,9 @@
 package com.ucace.api.controller;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -43,9 +47,13 @@ public class UserController {
 
     @GetMapping
     @Operation(summary = "Get All Users", description = "Retrieve a list of all users")
-    public ResponseEntity<ApiResponseDTO<List<UserResponseDTO>>> getAllUsers() {
-        List<UserResponseDTO> getAllUsers = userService.getAllUsers();
-        ApiResponseDTO<List<UserResponseDTO>> response = new ApiResponseDTO<>(
+    public ResponseEntity<ApiResponseDTO<Page<UserResponseDTO>>> getAllUsers(@RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "2") int size, @RequestParam(defaultValue = "userName") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction) {
+        Sort sort = direction.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<UserResponseDTO> getAllUsers = userService.getAllUsers(pageable);
+        ApiResponseDTO<Page<UserResponseDTO>> response = new ApiResponseDTO<>(
                 true,
                 "Get all Users",
                 getAllUsers,
@@ -87,6 +95,32 @@ public class UserController {
                 "User Deleted Successfully",
                 deleteRole,
                 LocalDateTime.now());
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/search")
+    @Operation(summary = "Search Users", description = "Search users by username or email")
+    public ResponseEntity<ApiResponseDTO<Page<UserResponseDTO>>> searchUsers(
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "2") int size,
+            @RequestParam(defaultValue = "userName") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction) {
+
+        Sort sort = direction.equalsIgnoreCase("asc")
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<UserResponseDTO> searchUsers = userService.searchUsers(keyword, pageable);
+
+        ApiResponseDTO<Page<UserResponseDTO>> response = new ApiResponseDTO<>(
+                true,
+                "Users retrieved successfully",
+                searchUsers,
+                LocalDateTime.now());
+
         return ResponseEntity.ok(response);
     }
 
