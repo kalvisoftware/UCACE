@@ -2,6 +2,8 @@ package com.ucace.api.service.impl;
 
 import java.time.LocalDateTime;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -34,6 +36,7 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final CustomUserDetailsService customUserDetailsService;
+    private static final Logger logger = LoggerFactory.getLogger(AuthServiceImpl.class);
 
     public AuthServiceImpl(UserRepository userRepository,
             RoleRepository roleRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil,
@@ -47,7 +50,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public UserResponseDTO registerUser(RegisterRequestDTO registerRequestDTO) {
-
+        logger.info("Register request received");
         User userEntity = convertToEntity(registerRequestDTO);
 
         User savedUser = userRepository.save(userEntity);
@@ -92,7 +95,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     public LoginResponseDTO loginUser(LoginRequestDTO loginRequestDTO) {
-
+        logger.info("Login request received for username : {}", loginRequestDTO.getUserName());
         User user = userRepository.findByUserName(loginRequestDTO.getUserName())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
@@ -147,6 +150,7 @@ public class AuthServiceImpl implements AuthService {
         user.setPassword(passwordEncoder.encode(changePasswordRequestDTO.getNewPassword()));
         user.setUpdatedDate(LocalDateTime.now());
         userRepository.save(user);
+        logger.info("Password changed successfully");
         return "Password changed successfully";
     }
 
@@ -167,13 +171,14 @@ public class AuthServiceImpl implements AuthService {
 
         RefreshTokenResponseDTO response = new RefreshTokenResponseDTO();
         response.setAccessToken(newAccessToken);
-
+        logger.info("Refresh token generated");
         return response;
     }
 
     @Override
     public String logout() {
         SecurityContextHolder.clearContext();
+        logger.info("Logout successful");
         return "Logout Successfully";
     }
 
